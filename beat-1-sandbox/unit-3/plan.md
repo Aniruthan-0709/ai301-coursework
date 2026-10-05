@@ -105,10 +105,24 @@ the `text()` change.
 - Because Redis still fails, `GET /health` keeps returning 503 after
   this fix until #62 is fixed. Someone reading only the HTTP status
   might think the fix didn't work, so I'll say this in the PR.
+- PR #82 (open) makes the same `text()` change and also fixes #62. I haven't reviewed it closely. My change stays limited to #61, and if #82 merges first I'll rebase onto it and keep only the regression test if it still adds coverage.
 - My repro ran on Windows with SQLAlchemy 2.1.1. I don't expect the fix
   to behave differently on other platforms, but I haven't checked.
 
 ## Deviations
 
-<!-- Fill in after the build: what changed from this plan and why, or
-that nothing changed. -->
+Nothing in the posted plan changed. The build is the one-line `text()`
+change in `api/routes/health.py` (plus the import) and a new
+`tests/unit/test_health.py`, on branch `fix/61-health-check-text-sql`,
+and the test plan ran on the same Windows and Docker setup as my unit 2
+repro. The after run shows `postgres_health_check_passed` and
+`'postgres': 'healthy'`, with the status still 503 because of #62, as
+the plan expected.
+
+One small detail the plan didn't spell out: a plain `AsyncMock` accepts
+any argument, so a test that only checked "postgres: healthy" would
+pass even without the fix. I made the mock's `execute()` raise
+SQLAlchemy's `ArgumentError` for plain strings, like the real session
+does, and checked that both tests fail with the fix reverted. That
+doesn't change what the posted plan says, so no follow-up comment on
+the issue is needed.
