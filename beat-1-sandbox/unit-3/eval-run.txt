@@ -1,5 +1,12 @@
-PS D:\codepath\AI301\assignment-starter\ai301-unit3-starter\eval> $env:PYTHONUTF8 = "1"
->> python run_eval.py --rubric "$HOME\.claude\skills\plan-check\rubric.md" --evidence "$HOME\.claude\skills\plan-check\references\evidence-guide.md" --save-run eval-run.txt
+# eval run written by run_eval.py at 2026-10-05T00:26:56Z
+# model: sonnet (pinned)
+# graded: C:\Users\saani\.claude\skills\plan-check
+# packages: 20 scored
+#   rubric.md  sha256:681799b97c405dfc
+#   evidence-guide.md  sha256:848caa92f9314810
+#   procedure.md  sha256:8d549a56da88c941
+#   SKILL.md  sha256:9bad3d6644a2d285
+#
 grading 20 package(s) with rubric.md + evidence-guide.md + procedure.md, model sonnet, 5 worker(s)...
   pkg-02: accept
   pkg-05: accept
@@ -46,5 +53,3 @@ pkg-20  thread-convention  reject  reject   yes
 
 categories: clear-accept 6/7  scope-creep 4/4  thread-convention 2/2  unbuildable 3/3  wrong-cause 4/4
 agreement: 19/20 scored items  (bar: 18/20: PASS)
-run written to eval-run.txt
-PS D:\codepath\AI301\assignment-starter\ai301-unit3-starter\eval> 
