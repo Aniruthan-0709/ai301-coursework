@@ -45,76 +45,68 @@ fix/61-health-check-text-sql
 
 **Evidence**
 
-Same script as my unit 2 repro (`repro_health.py`, calling `health_check()` directly), run on Linux, Python 3.11.15, SQLAlchemy 2.1.3, asyncpg 0.31.0, PostgreSQL 16 on localhost:5432.
+Environment: Windows 10.0.26200, Python 3.13.0, SQLAlchemy 2.1.1, asyncpg 0.31.0, PostgreSQL 16 via Docker. Same `repro_health.py` script as my unit 2 repro, calling `health_check()` directly.
 
-Before, at commit 2f4e82f (main, no fix):
+Before, at commit 2f4e82f (main, no fix). This is the output I posted in my unit 2 repro comment (https://github.com/codepath/pathreview-ai301-fa26-s3/issues/61#issuecomment-5861325937):
 
 ```
-$ git checkout 2f4e82f
-$ .venv/bin/python repro_health.py
+$ .venv/Scripts/python repro_health.py
 === Step 1: call health_check() directly (as the endpoint does) ===
-2026-10-04 22:01:27 [error    ] postgres_health_check_failed   error="Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')"
-2026-10-04 22:01:27 [error    ] redis_health_check_failed      error="'Settings' object has no attribute 'redis_host'"
-2026-10-04 22:01:27 [debug    ] vector_db_health_check_passed
+2026-09-27 20:33:36 [error    ] postgres_health_check_failed   error="Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')"
+2026-09-27 20:33:36 [error    ] redis_health_check_failed      error="'Settings' object has no attribute 'redis_host'"
+2026-09-27 20:33:36 [debug    ] vector_db_health_check_passed
 HTTPException status=503
-Detail: {'status': 'unhealthy', 'dependencies': {'postgres': 'unhealthy', 'redis': 'unhealthy', 'vector_db': 'healthy'}, 'safety_events_last_hour': 0, 'timestamp': '2026-10-04T22:01:27.088092'}
+Detail: {'status': 'unhealthy', 'dependencies': {'postgres': 'unhealthy', 'redis': 'unhealthy', 'vector_db': 'healthy'}, 'safety_events_last_hour': 0, 'timestamp': '2026-09-28T00:33:36.263347'}
 
 === Step 2: confirm text() fixes the underlying call ===
-2026-10-04 22:01:27,192 INFO sqlalchemy.engine.Engine select pg_catalog.version()
-2026-10-04 22:01:27,192 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,193 INFO sqlalchemy.engine.Engine select current_schema()
-2026-10-04 22:01:27,193 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,194 INFO sqlalchemy.engine.Engine show standard_conforming_strings
-2026-10-04 22:01:27,194 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,195 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-10-04 22:01:27,195 INFO sqlalchemy.engine.Engine SELECT 1
-2026-10-04 22:01:27,195 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ()
+2026-09-27 20:33:36,463 INFO sqlalchemy.engine.Engine SELECT 1
 text('SELECT 1') result: 1
-2026-10-04 22:01:27,196 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-27 20:33:36,466 INFO sqlalchemy.engine.Engine ROLLBACK
 ```
 
-After, at commit aeb2a0e on `fix/61-health-check-text-sql`:
+After, at commit 83c6fc2 on `fix/61-health-check-text-sql`:
 
 ```
-$ git checkout fix/61-health-check-text-sql
-$ .venv/bin/python repro_health.py
+$ docker compose up -d db
+$ .venv\Scripts\python repro_health.py
 === Step 1: call health_check() directly (as the endpoint does) ===
-2026-10-04 22:01:27,844 INFO sqlalchemy.engine.Engine select pg_catalog.version()
-2026-10-04 22:01:27,844 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,846 INFO sqlalchemy.engine.Engine select current_schema()
-2026-10-04 22:01:27,846 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,847 INFO sqlalchemy.engine.Engine show standard_conforming_strings
-2026-10-04 22:01:27,847 INFO sqlalchemy.engine.Engine [raw sql] ()
-2026-10-04 22:01:27,847 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-10-04 22:01:27,848 INFO sqlalchemy.engine.Engine SELECT 1
-2026-10-04 22:01:27,848 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
-2026-10-04 22:01:27 [debug    ] postgres_health_check_passed
-2026-10-04 22:01:27 [error    ] redis_health_check_failed      error="'Settings' object has no attribute 'redis_host'"
-2026-10-04 22:01:27 [debug    ] vector_db_health_check_passed
+2026-10-04 20:55:33,852 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-10-04 20:55:33,852 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-04 20:55:33,876 INFO sqlalchemy.engine.Engine select current_schema()
+2026-10-04 20:55:33,876 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-04 20:55:33,886 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-10-04 20:55:33,886 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-04 20:55:33,892 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-10-04 20:55:33,893 INFO sqlalchemy.engine.Engine SELECT 1
+2026-10-04 20:55:33,894 INFO sqlalchemy.engine.Engine [generated in 0.00038s] ()
+2026-10-04 20:55:33 [debug    ] postgres_health_check_passed
+2026-10-04 20:55:34 [error    ] redis_health_check_failed      error="'Settings' object has no attribute 'redis_host'"
+2026-10-04 20:55:34 [debug    ] vector_db_health_check_passed
 HTTPException status=503
-Detail: {'status': 'unhealthy', 'dependencies': {'postgres': 'healthy', 'redis': 'unhealthy', 'vector_db': 'healthy'}, 'safety_events_last_hour': 0, 'timestamp': '2026-10-04T22:01:27.819523'}
-2026-10-04 22:01:27,928 INFO sqlalchemy.engine.Engine ROLLBACK
+Detail: {'status': 'unhealthy', 'dependencies': {'postgres': 'healthy', 'redis': 'unhealthy', 'vector_db': 'healthy'}, 'safety_events_last_hour': 0, 'timestamp': '2026-10-05T00:55:33.708459'}
+2026-10-04 20:55:34,181 INFO sqlalchemy.engine.Engine ROLLBACK
 
 === Step 2: confirm text() fixes the underlying call ===
-2026-10-04 22:01:27,929 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-10-04 22:01:27,929 INFO sqlalchemy.engine.Engine SELECT 1
-2026-10-04 22:01:27,929 INFO sqlalchemy.engine.Engine [cached since 0.08164s ago] ()
+2026-10-04 20:55:34,189 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-10-04 20:55:34,190 INFO sqlalchemy.engine.Engine SELECT 1
+2026-10-04 20:55:34,190 INFO sqlalchemy.engine.Engine [cached since 0.2965s ago] ()
 text('SELECT 1') result: 1
-2026-10-04 22:01:27,930 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-10-04 20:55:34,194 INFO sqlalchemy.engine.Engine ROLLBACK
 ```
 
-In the before run, Step 1 never sends `SELECT 1` to the database (no SQL echo line) and postgres is reported unhealthy. In the after run, `SELECT 1` reaches Postgres, `postgres_health_check_passed` is logged, and the detail shows `'postgres': 'healthy'`. The status is still 503 because Redis fails for the separate #62 reason, which is what my plan said to expect.
+Before the fix, Step 1 logs `postgres_health_check_failed` with the `Textual SQL expression` error and the detail shows `'postgres': 'unhealthy'`. After the fix, `SELECT 1` reaches Postgres, `postgres_health_check_passed` is logged, and the detail shows `'postgres': 'healthy'`. The status is still 503 because Redis fails for the separate #62 reason, which my plan said to expect.
 
-New unit tests:
+New unit tests on the branch:
 
 ```
-$ .venv/bin/pytest tests/unit/test_health.py -v -m unit
+$ .venv\Scripts\pytest tests/unit/test_health.py -v -m unit
+collected 2 items
+
 tests/unit/test_health.py::TestHealthCheckPostgresProbe::test_probe_passes_text_clause PASSED [ 50%]
 tests/unit/test_health.py::TestHealthCheckPostgresProbe::test_reachable_postgres_reported_healthy PASSED [100%]
-========================= 2 passed, 1 warning in 0.65s =========================
-```
 
-With the `text()` change reverted, both tests fail.
+===================== 2 passed, 3 warnings in 5.00s ======================
+```
 
 ## Eval iterations
 
