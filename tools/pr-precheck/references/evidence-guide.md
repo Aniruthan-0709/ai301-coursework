@@ -68,12 +68,8 @@ tests. calib-01's diff is one removed line. Debris tells: a print,
 code or an earlier attempt; a function nothing calls (often behind
 `allow(dead_code)` or named `_unused`); a new TODO or FIXME; re-indented
 or reflowed lines with no change in meaning; reordered imports; and
-whole blocks of unchanged lines removed and added again (pkg-18's
-reprinted `println!` blocks). A correct fix with any of these riding
-along still fails `no-debris`. Not debris: an unchanged line shown as
-removed and re-added inside the statement the fix edits, such as
-pkg-02's `html = self.export_html(` around its changed `clear=False`
-argument.
+unchanged lines removed and added again. A correct fix with any of
+these riding along still fails `no-debris`.
 
 ## Standards and comms (harness category: standards-wall)
 
