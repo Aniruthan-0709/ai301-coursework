@@ -55,10 +55,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Turned my issue-select skill into issue-scout and patched its rubric after a bad accept**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I rewrote my fit profile around three priorities (AI engineering, then MLOps, then data engineering bugs in Python) and wrote one `gh search issues` query per priority, plus eight ranking rules that drop claimed, non-bug, and front-end results, cap each repo at two, and order by priority. My first queries returned nothing because I wrapped the OR keywords in quotes, which made `gh` search them as one exact phrase, and my first scan accepted AdeiaSaif/TicketFlow #9, a personal repo with no outside users, even though my profile asks for projects other people actually use. I added a required `repo-adopted` check (100+ stars or 5+ outside contributors) and dropped `Waiting for reply`/`security` labels before grading; on my next run that check rejected agentic-operator-core #86 (51 stars, one outside contributor). What still falls short: nothing in the rubric checks that the fix is a Python bug, so rafter-cli #31, a TypeScript feature, still passed.
 
 **Unit 6: [one line on the tool work]**
 
