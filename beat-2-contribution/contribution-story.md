@@ -58,11 +58,9 @@ one in the week it belongs to.
 
 I rewrote my fit profile around three priorities (AI engineering, then MLOps, then data engineering bugs in Python) and wrote one `gh search issues` query per priority, plus eight ranking rules that drop claimed, non-bug, and front-end results, cap each repo at two, and order by priority. My first queries returned nothing because I wrapped the OR keywords in quotes, which made `gh` search them as one exact phrase, and my first scan accepted AdeiaSaif/TicketFlow #9, a personal repo with no outside users, even though my profile asks for projects other people actually use. I added a required `repo-adopted` check (100+ stars or 5+ outside contributors) and dropped `Waiting for reply`/`security` labels before grading; on my next run that check rejected agentic-operator-core #86 (51 stars, one outside contributor). What still falls short: nothing in the rubric checks that the fix is a Python bug, so rafter-cli #31, a TypeScript feature, still passed.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: Installed the voice guard on Windows and wrote a repo memory file for context_chat_backend**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I added four Upstream rules to my voice guide (claims, questions, pings) and installed the guard hook, but on Windows the wiring test printed help text instead of stopping: pyenv-win's `python3` shim dropped the hook's stdin and Claude Code ran the command through its PowerShell tool, which the `Bash`-only matcher never saw, so I pointed the hook at the real `python.exe`, widened the matcher to `Bash|PowerShell` and let `check_voice.py` accept that tool name. Once it fired, the guard stopped my claim twice, first for asking two questions and then for asking without saying what I had checked, and checking the config to fix that showed the setting is `n_batch`, not the `batch_size` my draft named. For the repo memory file I ran one scoped orientation over the embedder config path and distilled it into 32 lines; it could not confirm the test command, so I read the CI workflow for it, and it surfaced the repo's AGENTS.md rule that agents must not write issue or PR text, which I added to the file and now follow.
 
 **Unit 7: [one line on the tool work]**
 
