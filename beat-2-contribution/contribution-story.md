@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Internal embedder with the default config only looks at the first 16 tokens of a chunk
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,10 +8,9 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+**Student:** Aniruthan Swaminathan Arulmurugan
+**GitHub Username:** Aniruthan-0709
+**Issue:** https://github.com/nextcloud/context_chat_backend/issues/359
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -79,24 +78,16 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+I searched with my issue-scout: three `gh search issues` queries, one per priority in my fit profile (AI engineering, then MLOps, then data engineering bugs in Python), plus ranking rules that drop claimed, non-bug and front-end results. My first scan on 2026-10-19 accepted nextcloud/context_chat_backend #359. The Issue Selection site had no AI tags, so I graded three picks from there and my scan, but this week every one of them had fallen through: inspect_ai #5712 was fixed by a merged PR, rafter-cli #31 was claimed by another contributor the day before, and agentic-operator-core #86 was closed. I went back to my scan and graded #359 and xarray #11527. The scout accepted #359 on all six checks with an "ambitious" difficulty note, because the fix design is still open: the issue proposes an admin setup check, and those usually live in the PHP app, not this backend. It rejected xarray #11527 because an open PR (#11582) already fixes it, which I had missed when I read the comments. Before claiming, I read CONTRIBUTING.md and Nextcloud's AI_POLICY.md: AI help is allowed with disclosure, but issue and PR text has to be in my own words. My claim comment: https://github.com/nextcloud/context_chat_backend/issues/359#issuecomment-6400518147
+
+#359 fits my first priority: it's an embeddings bug in a RAG backend, and the repo is all Python. The default config sets `n_batch: 16` for the multilingual-e5-large-instruct embedder, and llama-cpp-python silently truncates each chunk to that many tokens, so documents with the same first 16 tokens get identical vectors. I want to learn how to reproduce and test a silent quality bug like this one, where nothing errors and the output always looks valid, and how to work through an open design question with maintainers. My honest read of the scout: it held up better than I did. It caught the open xarray PR that I missed, and its repo-adopted check passed #359 on its outside contributors despite only 29 stars. It fell short in two ways. It still has no Python-only or bug-only check, so I checked the repo's languages by hand. And its verdicts go stale fast: two of my three picks went from open to taken or closed within a week, so I now regrade right before I claim.
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout (my search strategy and rubric). I regraded last week's three picks after this week's scope patch, then graded two new picks from my 2026-10-19 scan.
+- What it produced: an accept for #359 (all six checks pass, difficulty "ambitious": the admin setup check may belong in the PHP app), and rejects for the other four (merged fix, claimed, closed, open PR #11582).
+- Difficulties: my unit 1 `bounded-scope` check rejected issues whose design was still under open maintainer debate. #359 has exactly that (a member questioned the proposed setup check), so the old check would likely have rejected the issue I chose. The scout also has no Python-only check, and it ran into a permissions problem: `claude -p` can't approve reads of the skill folder, so I had to run it interactively.
+- What changed: I replaced `bounded-scope` with the `scope-feasible` check, which only rejects umbrella or checklist issues and turns open edges into a difficulty note. I also logged the change in scan-notes.md. I'd still add a check that the fix is in Python.
 
 ---
 
