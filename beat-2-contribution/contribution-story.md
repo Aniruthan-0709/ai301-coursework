@@ -120,34 +120,77 @@ I searched with my issue-scout: three `gh search issues` queries, one per priori
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+Windows 11, Python 3.13.0 (pyenv-win) in a fresh venv, llama-cpp-python 0.3.36 (the repo pins >=0.3.36) from the prebuilt CPU wheel index, and my fork's clone of nextcloud/context_chat_backend at master 91eabb8 (2026-10-23). The model is multilingual-e5-large-instruct-q6_k.gguf at Hugging Face revision 8738f8d, the exact file the backend downloads in context_chat_backend/controller.py (467,958,912 bytes). Standing up a full Nextcloud instance with the context_chat app and pgvector would have taken days, so I reproduced the embedding step directly: main_em.py passes the config's `embedding.llama` block (including `n_batch`) into llama-cpp's ModelSettings, and the server's /v1/embeddings endpoint calls `create_embedding`, so my script makes that same call with the same model and settings. Challenges: on Windows, `pip install llama-cpp-python` would normally need a C++ build, which the CPU wheel index avoided; and PowerShell 5 saved my output file as UTF-16, so I re-saved it as UTF-8.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. `python -m venv .venv359` and `.venv359\Scripts\python -m pip install "llama-cpp-python>=0.3.36" --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu`
+2. Download the model as `e5.gguf`: https://huggingface.co/Ralriki/multilingual-e5-large-instruct-GGUF/resolve/8738f8d3d8f311808479ecd5756607e24c6ca811/multilingual-e5-large-instruct-q6_k.gguf
+3. Save the script below as `repro_359.py` and run `.venv359\Scripts\python repro_359.py <path to clone> e5.gguf`. It reads the e5 embedder's `n_batch` from the clone's config.cpu.yaml (16), embeds the issue's two texts (same first sentence, different last line) with `create_embedding`, then repeats with `n_batch=512`.
+4. Observed result: at the default `n_batch: 16` the two vectors are identical; at 512 they differ.
+
+<details><summary>repro_359.py</summary>
+
+```python
+import math, re, sys
+from importlib.metadata import version
+from pathlib import Path
+from llama_cpp import Llama
+
+BASE = ("Air India is the flag carrier of India, headquartered in Gurugram, Haryana. "
+        "The airline is owned by Air India Limited, which is owned by the Tata Group (74.9%) "
+        "and Singapore Airlines (25.1%).\n")
+FIRST, SECOND = BASE + "My name is Koala.", BASE + "My mom is a scientist in sanpanpisko."
+
+def cosine(a, b):
+    return sum(x * y for x, y in zip(a, b)) / (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(y * y for y in b)))
+
+def run(model, n_batch):
+    llm = Llama(model_path=model, embedding=True, n_batch=n_batch, n_ctx=8192, verbose=False)
+    out = llm.create_embedding([FIRST, SECOND])
+    a, b = (d["embedding"] for d in out["data"])
+    print(f"n_batch={n_batch}: tokens={len(llm.tokenize(SECOND.encode()))} dims={len(a)}")
+    print(f"  text 1: {[round(x, 7) for x in a[:6]]}")
+    print(f"  text 2: {[round(x, 7) for x in b[:6]]}")
+    print(f"  identical={a == b} cosine={cosine(a, b):.6f}")
+
+clone, model = sys.argv[1], sys.argv[2]
+cfg = Path(clone, "config.cpu.yaml").read_text(encoding="utf-8")
+nb = int(re.search(r"e5-large-instruct.*?n_batch:\s*(\d+)", cfg, re.S).group(1))
+print(f"python {sys.version.split()[0]}, llama-cpp-python {version('llama_cpp_python')}, config n_batch={nb}")
+run(model, nb)
+run(model, 512)
+```
+
+</details>
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** none (no code change yet)
+- **Screenshots/logs:** output of the script, run 2026-10-25:
+
+```
+python 3.13.0, llama-cpp-python 0.3.36, config n_batch=16
+n_batch=16: tokens=63 dims=1024
+  text 1: [0.6221009, 0.533022, -0.590059, -1.2744323, 0.2300023, -0.5570188]
+  text 2: [0.6221009, 0.533022, -0.590059, -1.2744323, 0.2300023, -0.5570188]
+  identical=True cosine=1.000000
+n_batch=512: tokens=63 dims=1024
+  text 1: [0.4018736, 0.5523281, -1.0396839, -0.8474972, -0.1033665, -0.5725923]
+  text 2: [0.5335093, 0.3626443, -1.1045098, -0.9617444, 0.1893189, -0.4989873]
+  identical=False cosine=0.972992
+```
+
+- **My findings:** Reproduced. With the default config, two 63-token texts that share only their first sentence get exactly the same vector (cosine 1.000000), which is consistent with each chunk being cut to its first 16 tokens (llama-cpp-python's `embed()` defaults to `truncate=True`, as the issue links). Raising `n_batch` to 512 makes them differ (cosine 0.973). My values are not byte-identical to the issue's (0.6221 vs 0.6259 in the first value), likely from a different llama.cpp build or CPU, but the identical-pair result matches. llama-cpp also warned `n_ctx_seq (8192) > n_ctx_train (512)`: the model was trained on 512-token inputs, which matters for choosing a fixed default. I did not test inside a running Nextcloud instance or check the pgvector rows. The setting is `n_batch` under `embedding.llama`, not the `embedding.batch_size` key, which is commented out and only applies to a remote embedding service.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: repro-check with the wild scope, grading my claim and repro report together, plus the voice guard on the claim.
+- What it produced: two rejects and then an accept. All six checks passed on the third run (environment, followable steps, expected vs actual, honest outcome, conventions, claim quality).
+- Difficulties: the first run failed steps-followable because my report said "run repro_359.py" without including it; the second graded a half-fixed file with an empty script block (I had run the fix from the wrong folder) and caught that the model URL was missing; it also flagged "everything after 16 tokens is ignored" as stating a cause I had not observed. Starting it as `claude --add-dir <dir> "<prompt>"` silently swallowed the prompt as a folder.
+- What changed: I inlined the script, pinned the model URL, reworded the finding to "consistent with truncation", and now put the prompt before `--add-dir`.
 
 ---
-
 ## Solution Approach
 
 **Analysis**
