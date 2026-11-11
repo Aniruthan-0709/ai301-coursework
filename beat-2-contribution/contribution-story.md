@@ -1,4 +1,4 @@
-# Contribution: Internal embedder with the default config only looks at the first 16 tokens of a chunk
+# Contribution: Biomedical NER benchmark runs the model twice per fixture
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -10,7 +10,7 @@ files and no evidence uploads are part of Assignment 5.
 **Contribution Number:** [1]
 **Student:** Aniruthan Swaminathan Arulmurugan
 **GitHub Username:** Aniruthan-0709
-**Issue:** https://github.com/nextcloud/context_chat_backend/issues/359
+**Issue:** https://github.com/maziyarpanahi/openmed/issues/4963
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -76,16 +76,18 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-I searched with my issue-scout: three `gh search issues` queries, one per priority in my fit profile (AI engineering, then MLOps, then data engineering bugs in Python), plus ranking rules that drop claimed, non-bug and front-end results. My first scan on 2026-10-19 accepted nextcloud/context_chat_backend #359. The Issue Selection site had no AI tags, so I graded three picks from there and my scan, but this week every one of them had fallen through: inspect_ai #5712 was fixed by a merged PR, rafter-cli #31 was claimed by another contributor the day before, and agentic-operator-core #86 was closed. I went back to my scan and graded #359 and xarray #11527. The scout accepted #359 on all six checks with an "ambitious" difficulty note, because the fix design is still open: the issue proposes an admin setup check, and those usually live in the PHP app, not this backend. It rejected xarray #11527 because an open PR (#11582) already fixes it, which I had missed when I read the comments. Before claiming, I read CONTRIBUTING.md and Nextcloud's AI_POLICY.md: AI help is allowed with disclosure, but issue and PR text has to be in my own words. My claim comment: https://github.com/nextcloud/context_chat_backend/issues/359#issuecomment-6400518147
+My first issue was nextcloud/context_chat_backend #359, which my issue-scout accepted on 2026-10-19. I claimed it on 2026-10-25 (https://github.com/nextcloud/context_chat_backend/issues/359#issuecomment-6400518147) and reproduced it, but the maintainer then said they would rather fix it themselves, so I had to pick again with a week left. I scanned again on 2026-11-11 with Claude Code, using my scout's fit profile (AI engineering, then MLOps, then data engineering bugs in Python) and its checks for no competing PR, an adopted repo, and repo conventions. I limited the scan to issues opened since October 1 and to repos with 100+ stars. Most strong results were already taken: pycord #3437, repowise #5422, smolagents #3143, openinference #4269 and all three openmed good-first-issues had open PRs. pycord also failed the conventions check, because its CONTRIBUTING says AI use by new contributors "will likely result in the direct closure" of the PR, and the course requires me to disclose AI use. linagora/openrag #1384, a RAG chunking bug, passed the other checks, but the core team had put it on their next milestone without a help-wanted label. After #359, I didn't want another issue a maintainer planned to fix themselves.
 
-#359 fits my first priority: it's an embeddings bug in a RAG backend, and the repo is all Python. The default config sets `n_batch: 16` for the multilingual-e5-large-instruct embedder, and llama-cpp-python silently truncates each chunk to that many tokens, so documents with the same first 16 tokens get identical vectors. I want to learn how to reproduce and test a silent quality bug like this one, where nothing errors and the output always looks valid, and how to work through an open design question with maintainers. My honest read of the scout: it held up better than I did. It caught the open xarray PR that I missed, and its repo-adopted check passed #359 on its outside contributors despite only 29 stars. It fell short in two ways. It still has no Python-only or bug-only check, so I checked the repo's languages by hand. And its verdicts go stale fast: two of my three picks went from open to taken or closed within a week, so I now regrade right before I claim.
+maziyarpanahi/openmed #4963 passed everything. It's labeled bug and help wanted, with no assignee, and none of the repo's ~230 open PRs mention it. The repo has 5.8k stars, and outside contributors' PRs get merged within days. It fits my first priority, because it's in the evaluation harness for clinical NER models: the biomedical NER benchmark runs the model over every fixture twice, once for the overall score and once more for each corpus slice. That doubles inference cost. Worse, a model that doesn't answer the same way twice gets per-corpus numbers and an overall number in one report that come from different predictions. I want to learn how evaluation harnesses keep their numbers consistent. The issue is small and well specified (size S, with acceptance criteria), which matters with two units squeezed into one week. openmed has no AI policy. I drafted my claim with Claude Code, checked it against my voice guide, and posted it myself after my voice guard stopped it once for a missing report-back date. My claim comment: [[claim comment link]]
+
+What the scout got right: the open-PR check saved me from five dead ends in one pass. What fell short: it can't tell when a maintainer has already planned an issue themselves, which is what sank #359. #4963 has a maintainer milestone too, but the help-wanted label says outside help is welcome. That's the signal I'm now adding to how I read issues.
 
 **Toolkit**
 
-- Tool: issue-scout (my search strategy and rubric). I regraded last week's three picks after this week's scope patch, then graded two new picks from my 2026-10-19 scan.
-- What it produced: an accept for #359 (all six checks pass, difficulty "ambitious": the admin setup check may belong in the PHP app), and rejects for the other four (merged fix, claimed, closed, open PR #11582).
-- Difficulties: my unit 1 `bounded-scope` check rejected issues whose design was still under open maintainer debate. #359 has exactly that (a member questioned the proposed setup check), so the old check would likely have rejected the issue I chose. The scout also has no Python-only check, and it ran into a permissions problem: `claude -p` can't approve reads of the skill folder, so I had to run it interactively.
-- What changed: I replaced `bounded-scope` with the `scope-feasible` check, which only rejects umbrella or checklist issues and turns open edges into a difficulty note. I also logged the change in scan-notes.md. I'd still add a check that the fix is in Python.
+- Tool: issue-scout's fit profile and checks, run as a fresh scan with Claude Code on 2026-11-11 after #359 fell through.
+- What it produced: an accept for openmed #4963 (help wanted, no competing PR, adopted repo, no AI restrictions) and rejects for eight others: seven with open PRs, and pycord for its AI policy. openrag #1384 was set aside because the core team had planned it.
+- Difficulties: about 300 recent issues came back, and most good-first-issues already had an open PR. The rubric also has no signal for "the core team already planned this", which ended #359. GitHub's search rate limit slowed the scan.
+- What changed: I now read a maintainer-set milestone without a help-wanted label as "the team plans to do this", and I treat a help-wanted label as an invitation. I'd add that as a scout check.
 
 ---
 
@@ -93,26 +95,26 @@ I searched with my issue-scout: three `gh search issues` queries, one per priori
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+openmed's biomedical NER benchmark (`run_biomedical_ner_benchmark`) scores a model on five public corpora (BC5CDR, NCBI-disease, JNLPBA, Species-800, BC2GM) and reports an overall score plus one score per corpus. To get the per-corpus scores, it runs the model over every fixture a second time instead of reusing the predictions from the overall pass.
 
 **Expected Behavior**
 
-[What should happen?]
+Each fixture goes through the model once, and the overall and per-corpus metrics come from those same predictions. For a deterministic model the report doesn't change.
 
 **Current Behavior**
 
-[What actually happens?]
+Each fixture goes through the model twice, so a benchmark run costs twice the inference. When no runner is passed, each per-corpus pass also builds its own default runner and model loader. A runner that doesn't return the same spans every time can produce per-corpus slices that disagree with the overall score in the same report. In my repro, the overall F1 was 1.00 and every corpus scored 0.00.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+`openmed/eval/datasets/biomedical_ner.py`: `run_biomedical_ner_benchmark` and `_per_corpus_metrics`. The fix also relies on `run_benchmark` and `_shared_default_model_runner` in `openmed/eval/harness.py` but doesn't change them. Tests are in `tests/unit/eval/test_biomedical_ner_suite.py`.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code reading the source at master 35fe34e22, starting from the line numbers in the issue's "Problem and existing coverage" section.
+- What it produced: a trace of the two `run_benchmark` calls, plus a detail the issue doesn't mention: with no runner, every per-corpus call builds a fresh `_shared_default_model_runner()`, so the model loader is rebuilt for each corpus.
+- Difficulties: `harness.py` is about 3,600 lines, so I had to work out which helpers the suite actually reaches (`run_benchmark` and its default-runner fallback) before I trusted the trace.
+- What changed: I put the default-runner detail in my claim and my plan, so the fix resolves the runner once in the suite function instead of only caching predictions.
 
 ---
 
@@ -120,142 +122,276 @@ I searched with my issue-scout: three `gh search issues` queries, one per priori
 
 **Environment Setup**
 
-Windows 11, Python 3.13.0 (pyenv-win) in a fresh venv, llama-cpp-python 0.3.36 (the repo pins >=0.3.36) from the prebuilt CPU wheel index, and my fork's clone of nextcloud/context_chat_backend at master 91eabb8 (2026-10-23). The model is multilingual-e5-large-instruct-q6_k.gguf at Hugging Face revision 8738f8d, the exact file the backend downloads in context_chat_backend/controller.py (467,958,912 bytes). Standing up a full Nextcloud instance with the context_chat app and pgvector would have taken days, so I reproduced the embedding step directly: main_em.py passes the config's `embedding.llama` block (including `n_batch`) into llama-cpp's ModelSettings, and the server's /v1/embeddings endpoint calls `create_embedding`, so my script makes that same call with the same model and settings. Challenges: on Windows, `pip install llama-cpp-python` would normally need a C++ build, which the CPU wheel index avoided; and PowerShell 5 saved my output file as UTF-16, so I re-saved it as UTF-8.
+Windows 11 and Python 3.13.0 (pyenv-win). The clone is my fork of maziyarpanahi/openmed at master 35fe34e22 (2026-11-08), cloned with `gh repo fork maziyarpanahi/openmed --clone -- --filter=blob:none -c core.autocrlf=false` and set up with `uv sync --frozen --extra dev`, as CONTRIBUTING.md says. No model download is needed. The repro uses fake runners and five synthetic one-document corpora written to a temp folder, the same pattern the repo's own tests use, so it runs offline in seconds. Challenges: the repo is about 3,300 Python files, so I used a blobless clone. I turned off `core.autocrlf` so ruff and the patch files see LF line endings. Windows has no `make`, so I ran the commands behind the Makefile targets directly. My first attempt failed because I hadn't saved the script and patch files where the commands expected them.
 
 **Steps to Reproduce**
 
-1. `python -m venv .venv359` and `.venv359\Scripts\python -m pip install "llama-cpp-python>=0.3.36" --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu`
-2. Download the model as `e5.gguf`: https://huggingface.co/Ralriki/multilingual-e5-large-instruct-GGUF/resolve/8738f8d3d8f311808479ecd5756607e24c6ca811/multilingual-e5-large-instruct-q6_k.gguf
-3. Save the script below as `repro_359.py` and run `.venv359\Scripts\python repro_359.py <path to clone> e5.gguf`. It reads the e5 embedder's `n_batch` from the clone's config.cpu.yaml (16), embeds the issue's two texts (same first sentence, different last line) with `create_embedding`, then repeats with `n_batch=512`.
-4. Observed result: at the default `n_batch: 16` the two vectors are identical; at 512 they differ.
+1. `gh repo fork maziyarpanahi/openmed --clone -- --filter=blob:none -c core.autocrlf=false`, then `cd openmed` and `uv sync --frozen --extra dev`
+2. Save the script below as `repro_4963.py` next to the clone (I used `..\unit7\`).
+3. On master, run `uv run --frozen --extra dev python ..\unit7\repro_4963.py`. It counts runner calls per fixture, then uses a runner that returns gold spans on a fixture's first call and nothing after, and prints the overall and per-corpus exact F1.
+4. Observed result: 10 runner calls for 5 fixtures (2 each). With the drifting runner, overall exact F1 is 1.00 and every corpus is 0.00.
 
-<details><summary>repro_359.py</summary>
+<details><summary>repro_4963.py</summary>
 
 ```python
-import math, re, sys
-from importlib.metadata import version
+"""Reproduce maziyarpanahi/openmed#4963: the biomedical NER suite runs the
+model over every fixture twice (once overall, once more per corpus).
+
+Run from the top folder of the openmed clone:
+    uv run --frozen --extra dev python repro_4963.py
+Uses five synthetic one-document corpora and fake runners, so no model is
+downloaded and nothing touches the network.
+"""
+
+import json
+import subprocess
+import tempfile
+from collections import Counter
 from pathlib import Path
-from llama_cpp import Llama
 
-BASE = ("Air India is the flag carrier of India, headquartered in Gurugram, Haryana. "
-        "The airline is owned by Air India Limited, which is owned by the Tata Group (74.9%) "
-        "and Singapore Airlines (25.1%).\n")
-FIRST, SECOND = BASE + "My name is Koala.", BASE + "My mom is a scientist in sanpanpisko."
+from openmed.eval.datasets import (
+    BC2GM,
+    BC5CDR,
+    BIOMEDICAL_NER_CORPORA,
+    JNLPBA,
+    NCBI_DISEASE,
+    SPECIES_800,
+    load_biomedical_ner_fixtures,
+    run_biomedical_ner_benchmark,
+)
 
-def cosine(a, b):
-    return sum(x * y for x, y in zip(a, b)) / (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(y * y for y in b)))
 
-def run(model, n_batch):
-    llm = Llama(model_path=model, embedding=True, n_batch=n_batch, n_ctx=8192, verbose=False)
-    out = llm.create_embedding([FIRST, SECOND])
-    a, b = (d["embedding"] for d in out["data"])
-    print(f"n_batch={n_batch}: tokens={len(llm.tokenize(SECOND.encode()))} dims={len(a)}")
-    print(f"  text 1: {[round(x, 7) for x in a[:6]]}")
-    print(f"  text 2: {[round(x, 7) for x in b[:6]]}")
-    print(f"  identical={a == b} cosine={cosine(a, b):.6f}")
+def bigbio(record_id, text, entities):
+    return {
+        "id": record_id,
+        "passages": [{"offsets": [[0, len(text)]], "text": text}],
+        "entities": [
+            {"id": f"T{s}-{e}", "offsets": [[s, e]], "text": [text[s:e]], "type": t}
+            for t, s, e in entities
+        ],
+    }
 
-clone, model = sys.argv[1], sys.argv[2]
-cfg = Path(clone, "config.cpu.yaml").read_text(encoding="utf-8")
-nb = int(re.search(r"e5-large-instruct.*?n_batch:\s*(\d+)", cfg, re.S).group(1))
-print(f"python {sys.version.split()[0]}, llama-cpp-python {version('llama_cpp_python')}, config n_batch={nb}")
-run(model, nb)
-run(model, 512)
+
+def write_suite(root: Path) -> None:
+    docs = {
+        BC5CDR: bigbio(
+            "bc5-1",
+            "Aspirin treats melanoma.",
+            [("Chemical", 0, 7), ("Disease", 15, 23)],
+        ),
+        NCBI_DISEASE: bigbio(
+            "ncbi-1", "Breast cancer progresses.", [("Disease", 0, 13)]
+        ),
+        JNLPBA: bigbio(
+            "jnlpba-1", "BRCA1 protein activates T cells.", [("protein", 0, 13)]
+        ),
+    }
+    for corpus, doc in docs.items():
+        (root / f"{corpus}.json").write_text(
+            json.dumps({"documents": [doc]}), encoding="utf-8"
+        )
+    (root / f"{SPECIES_800}.conll").write_text(
+        "Escherichia B-Species\ncoli I-Species\ngrows O\n", encoding="utf-8"
+    )
+    (root / f"{BC2GM}.conll").write_text(
+        "TP53 B-GENE\nregulates O\nEGFR B-GENE\n", encoding="utf-8"
+    )
+
+
+def main() -> None:
+    commit = subprocess.run(
+        ["git", "log", "-1", "--format=%h %cd", "--date=short"],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    branch = subprocess.run(
+        ["git", "branch", "--show-current"], capture_output=True, text=True
+    ).stdout.strip()
+    print(f"openmed {branch} at {commit}")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        write_suite(Path(tmp))
+        fixtures = load_biomedical_ner_fixtures(tmp)
+
+    calls = Counter()
+
+    def counting_runner(fixture, model_name, device):
+        calls[fixture.fixture_id] += 1
+        return list(fixture.gold_spans)
+
+    run_biomedical_ner_benchmark(fixtures, model_name="fake", runner=counting_runner)
+    print(f"1) counting runner: {len(fixtures)} fixtures, {sum(calls.values())} calls")
+    for fixture_id, count in sorted(calls.items()):
+        print(f"   {fixture_id}: {count}")
+
+    seen = Counter()
+
+    def drifting_runner(fixture, model_name, device):
+        # Gold spans on a fixture's first call, nothing on later calls.
+        seen[fixture.fixture_id] += 1
+        return list(fixture.gold_spans) if seen[fixture.fixture_id] == 1 else []
+
+    report = run_biomedical_ner_benchmark(
+        fixtures, model_name="fake", runner=drifting_runner
+    ).to_dict()["metrics"]
+    print("2) runner that changes its answer on a second call:")
+    print(f"   overall exact F1: {report['exact_span_f1']['f1']:.2f}")
+    for corpus in BIOMEDICAL_NER_CORPORA:
+        f1 = report["per_corpus"][corpus]["exact_span_f1"]["f1"]
+        print(f"   {corpus} exact F1: {f1:.2f}")
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 </details>
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** none (no code change yet)
-- **Screenshots/logs:** output of the script, run 2026-10-25:
+- **Commit showing reproduction:** none. The repro is a standalone script run against master 35fe34e22. My regression tests (commit cfa912599 on my branch) reproduce it inside the repo's own suite: both fail on master.
+- **Screenshots/logs:** output on master, run 2026-11-10:
 
 ```
-python 3.13.0, llama-cpp-python 0.3.36, config n_batch=16
-n_batch=16: tokens=63 dims=1024
-  text 1: [0.6221009, 0.533022, -0.590059, -1.2744323, 0.2300023, -0.5570188]
-  text 2: [0.6221009, 0.533022, -0.590059, -1.2744323, 0.2300023, -0.5570188]
-  identical=True cosine=1.000000
-n_batch=512: tokens=63 dims=1024
-  text 1: [0.4018736, 0.5523281, -1.0396839, -0.8474972, -0.1033665, -0.5725923]
-  text 2: [0.5335093, 0.3626443, -1.1045098, -0.9617444, 0.1893189, -0.4989873]
-  identical=False cosine=0.972992
+openmed fix/issue-4963-single-ner-inference at 35fe34e22 2026-11-08
+1) counting runner: 5 fixtures, 10 calls
+   bc2gm:bc2gm-1: 2
+   bc5cdr:bc5-1: 2
+   jnlpba:jnlpba-1: 2
+   ncbi_disease:ncbi-1: 2
+   species_800:species_800-1: 2
+2) runner that changes its answer on a second call:
+   overall exact F1: 1.00
+   bc5cdr exact F1: 0.00
+   ncbi_disease exact F1: 0.00
+   jnlpba exact F1: 0.00
+   species_800 exact F1: 0.00
+   bc2gm exact F1: 0.00
 ```
 
-- **My findings:** Reproduced. With the default config, two 63-token texts that share only their first sentence get exactly the same vector (cosine 1.000000), which is consistent with each chunk being cut to its first 16 tokens (llama-cpp-python's `embed()` defaults to `truncate=True`, as the issue links). Raising `n_batch` to 512 makes them differ (cosine 0.973). My values are not byte-identical to the issue's (0.6221 vs 0.6259 in the first value), likely from a different llama.cpp build or CPU, but the identical-pair result matches. llama-cpp also warned `n_ctx_seq (8192) > n_ctx_train (512)`: the model was trained on 512-token inputs, which matters for choosing a fixed default. I did not test inside a running Nextcloud instance or check the pgvector rows. The setting is `n_batch` under `embedding.llama`, not the `embedding.batch_size` key, which is commented out and only applies to a remote embedding service.
+- **My findings:** Reproduced. Every fixture is passed to the runner twice, once by the overall `run_benchmark` call and once more by `_per_corpus_metrics`. When the runner's answer changes between calls, the per-corpus F1 comes from different predictions than the overall F1, so the same report says 1.00 overall and 0.00 for every corpus. I did not run a real NER model. The fake runners show the call count and the mismatch directly, and the issue's own acceptance criteria use the same kind of counting runner.
 
 **Toolkit**
 
-- Tool: repro-check with the wild scope, grading my claim and repro report together, plus the voice guard on the claim.
-- What it produced: two rejects and then an accept. All six checks passed on the third run (environment, followable steps, expected vs actual, honest outcome, conventions, claim quality).
-- Difficulties: the first run failed steps-followable because my report said "run repro_359.py" without including it; the second graded a half-fixed file with an empty script block (I had run the fix from the wrong folder) and caught that the model URL was missing; it also flagged "everything after 16 tokens is ignored" as stating a cause I had not observed. Starting it as `claude --add-dir <dir> "<prompt>"` silently swallowed the prompt as a folder.
-- What changed: I inlined the script, pinned the model URL, reworded the finding to "consistent with truncation", and now put the prompt before `--add-dir`.
+- Tool: a standalone repro script with fake runners, written with Claude Code and run by me on my machine. My voice guard checked the claim before it posted.
+- What it produced: the call count (10 for 5 fixtures) and the F1 mismatch (1.00 overall, 0.00 per corpus) on master. These are the same numbers my plan and tests use.
+- Difficulties: my voice guard stopped my claim because it had no report-back date, which my own unit 6 rule requires. My first run also failed with "can't open file" because I hadn't saved the files yet.
+- What changed: I added "by Thursday, November 12" to the claim, and from then on I wrote the files from PowerShell instead of downloading them.
 
 ---
 ## Solution Approach
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+`run_biomedical_ner_benchmark` in `openmed/eval/datasets/biomedical_ner.py` scores the
+suite in two passes. First it calls `run_benchmark` (`openmed/eval/harness.py`) over all
+fixtures, and `run_benchmark` calls the model runner once per fixture. Then it calls
+`_per_corpus_metrics`, which groups the fixtures by their `dataset` metadata and calls
+`run_benchmark` again for each corpus with the same `runner`. So every fixture goes through
+the model twice. When `runner` is None it is worse: each `run_benchmark` call builds its own
+`_shared_default_model_runner()`, so the model loader is created again for every corpus.
+
+Two consequences, both in the issue: a reproduction run costs twice the inference, and a
+runner that does not return the same spans every time (sampling, GPU nondeterminism, a
+remote model) can produce per-corpus slices that disagree with the overall score in the
+same report. My offline repro (`repro_4963.py`, fake runners, five synthetic one-document
+corpora) shows both on master (run 2026-11-10): 10 runner calls for 5 fixtures, and a runner that answers
+differently on a second call gives overall exact F1 1.00 but 0.00 for every corpus.
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+Run the model once and score the slices from the same predictions, the "replay runner over
+the in-memory results" the issue suggests:
+
+- In `run_biomedical_ner_benchmark`, resolve the runner once (`runner` or
+  `_shared_default_model_runner()`, the same fallback `run_benchmark` uses).
+- Pass `run_benchmark` a recording runner that calls the real runner and keeps each
+  fixture's raw predictions in a dict keyed by `fixture_id` (`run_benchmark` already
+  rejects duplicate ids).
+- Pass `_per_corpus_metrics` a replay runner that returns the recorded predictions, so the
+  per-corpus `run_benchmark` calls do no inference. Their F1 math stays exactly as it is.
+
+Not changing: `run_benchmark` and the rest of `harness.py`, `_per_corpus_metrics`'s
+grouping and output keys, the report format, the CLI, and the other suites. For a
+deterministic runner the report is unchanged. The per-corpus calls still time the replay,
+but `_per_corpus_metrics` only keeps F1, fixture and span counts, so no latency number
+changes. Caching across runs (`cache_dir`) is out of scope.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
+1. `tests/unit/eval/test_biomedical_ner_suite.py`: add
+   `test_biomedical_ner_runs_the_model_once_per_fixture` (a counting runner must be called
+   exactly once per fixture) and
+   `test_biomedical_ner_per_corpus_slices_use_the_overall_predictions` (a runner that
+   returns gold spans on the first call and nothing after; overall and every corpus slice
+   must both score 1.0). Run them on master first and confirm both fail.
+2. `openmed/eval/datasets/biomedical_ner.py`: add the recording and replay runners in
+   `run_biomedical_ner_benchmark` as above, import `_shared_default_model_runner` from the
+   harness, and tighten `_per_corpus_metrics`'s `runner` type from `ModelRunner | None` to
+   `ModelRunner`, since it now always gets one.
+3. `CHANGELOG.md`: one line under Unreleased / Fixed, as CONTRIBUTING asks when behavior
+   changes.
+4. Re-run `repro_4963.py` on the branch (expect 5 calls and F1 1.00 everywhere), run
+   `uv run --frozen --extra dev pytest tests/unit/eval/test_biomedical_ner_suite.py -q`
+   (the issue's acceptance command) and the full suite, then the commands behind
+   `make lint`, `make format-check` and `make type-check` (`uv run ... ruff check .`,
+   the effect-path check, `ruff format --check .`, `mypy`), since Windows has no `make`.
 
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+Deviation (2026-11-10): the full suite gives 65 failures on my Windows machine, and the
+same 65 fail on master (symlink privilege WinError 1314, CRLF golden files, and similar
+environment checks), none in files that import `biomedical_ner`. I list it as excluded in
+my ship manifest and rely on the PR's Linux CI for it.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: plan-check, grading `plan.md` and `plan-comment.md` for #4963 in an interactive `claude` session, with the skill folder added through `--add-dir`.
+- What it produced: accept on the first run. All six required checks passed (cause-fits-evidence, fix-targets-cause, one-bounded-change, stranger-can-start, decisive-test, thread-and-policy), and so did both preferred checks. It confirmed my line references at 35fe34e22 and that `run_benchmark` rejects duplicate fixture IDs, which my replay dict relies on.
+- Difficulties: its procedure still expects the classroom repo. It looks for a `Repo:` line and a separately posted repro comment, and it doesn't read the voice guide in `~/.claude/voice-guard/`. It also said my comment repeats the issue's trace, and that it doesn't name the file it changes.
+- What changed: I put the 65 Windows-only test failures in the plan as a dated deviation, so the PR says it up front. I still need to update plan-check's procedure for real repos: no `Repo:` line, a repro that can live in the plan comment, and a pointer to my real voice guide.
 
 ---
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+Three layers, each run before and after the fix, on Windows 11 with Python 3.13.0:
+
+1. **The reproduction, re-run.** `repro_4963.py` on master gives 10 runner calls for 5 fixtures, plus overall F1 1.00 against 0.00 for every corpus. On my branch it gives 5 calls (1 each) and 1.00 everywhere.
+2. **Regression tests that fail without the fix.** `test_biomedical_ner_runs_the_model_once_per_fixture` (a counting runner must be called exactly once per fixture) and `test_biomedical_ner_per_corpus_slices_use_the_overall_predictions` (a drifting runner must still score 1.00 on every slice) come straight from the issue's acceptance criteria. With only the tests applied on master: `2 failed, 8 passed`. With the fix: `10 passed`. The existing per-corpus F1 test and the CLI test still pass, which shows the report is unchanged for a deterministic runner.
+3. **The repo's own checks** from CONTRIBUTING.md, run with uv because Windows has no `make`: `pytest tests/unit/eval/test_biomedical_ner_suite.py tests/unit/test_model_registry.py` (the only two test files that import the module) gives `23 passed`; `ruff check .` prints `All checks passed!`; the effect-path check prints `effect_paths_verified`; `ruff format --check .` reports `3331 files already formatted`; and `mypy` prints `Success: no issues found`. The full PR selection (`pytest tests/ -m "not slow and not fuzz" -n auto`) gave `65 failed, 29217 passed`. I re-ran those 31 failing files on master and got the same `65 failed`. They're Windows environment failures: symlinks need admin rights (WinError 1314), golden files expect LF, and a few similar checks. None of them touch `biomedical_ner`, so I excluded the full suite in my ship manifest with that reason and will rely on the PR's Linux CI.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the repo's pytest, ruff and mypy through `uv run`, my repro script, and the ship-gate manifest that lists which checks must pass.
+- What it produced: before and after outputs for all three layers (saved in `test_evidence.md`) and a manifest with four checks that must pass and one dated exclusion.
+- Difficulties: the full suite took 11 minutes and failed 65 tests, all on Windows and none in my code. Proving that took a second run of just those files on master.
+- What changed: I narrowed the manifest's test row to the files that exercise my change, and moved the full suite to the excluded table with the master result as evidence, instead of deleting it.
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-11-10**
 
-**[Date]**
+My #359 claim fell through after the maintainer said they'd fix it themselves, so I scanned again with my scout's checks and picked openmed #4963. Reading `run_biomedical_ner_benchmark` confirmed the double `run_benchmark` call. It also showed that with no runner passed, each per-corpus call builds a fresh default runner, so the model loader is rebuilt for every corpus. That's why the fix resolves the runner once in the suite function, instead of only caching predictions.
 
-[Entry]
+**2026-11-10**
 
-**[Date]**
+I considered adding a predictions parameter to `run_benchmark` in `harness.py`. I dropped it because every other suite uses that function, and the issue says a replay runner is enough. The fix stays inside `biomedical_ner.py`: a recording runner for the overall pass and a replay runner keyed by `fixture_id` for the per-corpus pass. That's safe because `run_benchmark` already rejects duplicate IDs. The per-corpus calls still time the replay, but `_per_corpus_metrics` keeps only F1 and counts, so no reported latency changes. The repo's pinned ruff (0.15.22) asked for one line to be wrapped.
 
-[Entry]
+**2026-11-10**
+
+Posted my claim after the voice guard made me add a report-back date. Forked and cloned with LF line endings, then ran the repro on master: 10 calls for 5 fixtures, and 0.00 per-corpus F1 with the drifting runner. I applied only the tests first and confirmed both fail (`2 failed, 8 passed`), then committed them (cfa912599). I applied the fix and re-ran: 5 calls, 1.00 everywhere, `10 passed`, ruff clean. Committed the fix (11991c6c4).
+
+**2026-11-10**
+
+The full test suite failed 65 tests, which worried me until I saw they were all symlink-privilege and line-ending failures. Re-running the same 31 files on master gave the same 65, so I recorded the full suite as excluded in my manifest instead of chasing failures my change didn't cause. I installed the ship-gate and patched it for Windows the same way as my unit 6 voice guard: the real python.exe instead of the pyenv shim, the matcher widened to `Bash|PowerShell`, and `claude` resolved with `shutil.which`. The hook test stopped `gh pr create --help` with `ship-gate: STOP.`, and plan-check accepted my plan on the first run.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code for drafting the fix, the tests and the PowerShell blocks. I ran every command on my machine and pasted the output back.
+- What it produced: two commits (tests, then fix), the patch files, and the Windows patch for the ship-gate.
+- Difficulties: the cloud session that drafted the fix wasn't allowed to run openmed's code, so nothing was verified until I ran it. Copying long blocks out of the app sometimes adds `\_`, so every block that writes a file strips that.
+- What changed: I treat every number as unconfirmed until my own run prints it. The plan's predicted numbers were marked "confirm" until my output matched them.
 
 ---
 
