@@ -58,7 +58,7 @@ Full selection: `uv run --frozen --extra dev pytest tests/ -q -m "not slow and n
 - [ ] For Swift/OpenMedKit changes, I ran `make format-swift` and `make lint-swift`: N/A, no Swift changes.
 - [x] I have performed a self-review of my own code
 - [x] I have commented my code, particularly in hard-to-understand areas
-- [x] My changes generate no new warnings
+- [x] My changes generate no new warnings: the tests for the changed module run with no warnings (`23 passed, 4 subtests passed`), and `ruff check` and `mypy` are clean.
 
 ## Dependencies
 - [x] I have not added any new dependencies
@@ -77,6 +77,4 @@ Related to #416 (linked from the issue)
 N/A. The before and after output is under Testing.
 
 ## Notes for Reviewers
-AI use: I used Claude Code for this PR. It traced the double inference, wrote the fix, the two tests, the offline repro script and a draft of this description. I ran every command and test shown here on my Windows 11 machine, and I'll handle the review feedback.
-
-Generated with [Claude Code](https://claude.com/claude-code)
+AI use: I used an AI coding assistant for this PR. It traced the double inference, wrote the fix, the two tests, the offline repro script and a draft of this description. I ran every command and test shown here on my Windows 11 machine, and I'll handle the review feedback.
