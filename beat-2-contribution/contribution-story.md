@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Aniruthan Swaminathan Arulmurugan
 **GitHub Username:** Aniruthan-0709
 **Issue:** https://github.com/maziyarpanahi/openmed/issues/4963
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** https://github.com/maziyarpanahi/openmed/pull/5541
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -62,10 +62,9 @@ I rewrote my fit profile around three priorities (AI engineering, then MLOps, th
 
 I added four Upstream rules to my voice guide (claims, questions, pings) and installed the guard hook, but on Windows the wiring test printed help text instead of stopping: pyenv-win's `python3` shim dropped the hook's stdin and Claude Code ran the command through its PowerShell tool, which the `Bash`-only matcher never saw, so I pointed the hook at the real `python.exe`, widened the matcher to `Bash|PowerShell` and let `check_voice.py` accept that tool name. Once it fired, the guard stopped my claim twice, first for asking two questions and then for asking without saying what I had checked, and checking the config to fix that showed the setting is `n_batch`, not the `batch_size` my draft named. For the repo memory file I ran one scoped orientation over the embedder config path and distilled it into 32 lines; it could not confirm the test command, so I read the CI workflow for it, and it surfaced the repo's AGENTS.md rule that agents must not write issue or PR text, which I added to the file and now follow.
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: Installed the ship-gate on Windows, and it stopped my PR three times before letting it through**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+My gate manifest for openmed lists four must-pass checks (the two test files that import `biomedical_ner`, the commands behind `make lint`, `make format-check` and `make type-check`) and excludes the full suite with a dated reason, because 65 tests fail on my Windows machine on master too. The gate needed the same Windows patch as my voice guard (real `python.exe`, a `Bash|PowerShell` matcher, `claude` found with `shutil.which`). On my real branch all four checks passed every time, but my pr-precheck stopped the PR three times: first because the description file didn't exist yet, then because the draft ended in a "Generated with" footer that openmed's AGENTS.md bans and ticked "no new warnings" without evidence. The third stop came from my voice guard: my rule said to name the AI tool, but AGENTS.md forbids tool names in PR text. So I fixed the rule instead of breaking the repo's: when a repo bans vendor names, I write "an AI coding assistant" and still say what it did and what I checked. After that the gate passed and I opened the PR through Claude Code.
 
 **Unit 8: [one line on the tool work]**
 
@@ -397,27 +396,22 @@ The full test suite failed 65 tests, which worried me until I saw they were all 
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/maziyarpanahi/openmed/pull/5541 (opened 2026-11-10)
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** The PR follows openmed's template. It explains that `run_biomedical_ner_benchmark` ran the model over every fixture twice, and that the fix records each fixture's predictions in the overall pass and replays them for the per-corpus slices, the replay approach the issue suggests. It lists the three changed files, shows the before and after numbers (10 calls to 5, per-corpus F1 0.00 to 1.00, `2 failed` to `10 passed`), states the 65 Windows-only full-suite failures and that the same 65 fail on master, and marks every template box I couldn't tick as N/A with a reason. It says `Fixes #4963` and `Closes #4963`. Under Notes for Reviewers it discloses that I used an AI coding assistant to trace the bug and draft the fix, tests, repro and description, and that I ran every command myself. It doesn't name the tool, because AGENTS.md forbids that.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-10: none yet. I opened the PR the same evening.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: my ship-gate (a PreToolUse hook that runs my manifest's checks and my pr-precheck before `gh pr create`), with my voice guard behind it. I ran `check_gate.py --branch --base master` by hand until it passed, then opened the PR by asking Claude Code to run `gh pr create --body-file pr_draft.md` unchanged.
+- What it produced: three stops, then `ship-gate: PASS` with every repo check and every rubric check passing, and PR #5541.
+- Difficulties: the first stop was mine, because I ran the gate before writing the description file. The second stop caught a generation footer that openmed's AGENTS.md bans, a rule I'd missed when I wrote "no AI policy" in my notes. The third came from my voice guard: its rule to name the AI tool conflicted with the same AGENTS.md rule. The gate only lets an unchanged PR through for 30 minutes, so every fix meant running it again.
+- What changed: I removed the footer and the tool name, cited evidence for the warnings box, and added a repo exception to my voice-guide disclosure rule. I now read a repo's AGENTS.md as well as CONTRIBUTING before calling it policy-free.
 
 ---
 
