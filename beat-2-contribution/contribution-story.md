@@ -66,10 +66,9 @@ I added four Upstream rules to my voice guide (claims, questions, pings) and ins
 
 My gate manifest for openmed lists four must-pass checks (the two test files that import `biomedical_ner`, the commands behind `make lint`, `make format-check` and `make type-check`) and excludes the full suite with a dated reason, because 65 tests fail on my Windows machine on master too. The gate needed the same Windows patch as my voice guard (real `python.exe`, a `Bash|PowerShell` matcher, `claude` found with `shutil.which`). On my real branch all four checks passed every time, but my pr-precheck stopped the PR three times: first because the description file didn't exist yet, then because the draft ended in a "Generated with" footer that openmed's AGENTS.md bans and ticked "no new warnings" without evidence. The third stop came from my voice guard: my rule said to name the AI tool, but AGENTS.md forbids tool names in PR text. So I fixed the rule instead of breaking the repo's: when a repo bans vendor names, I write "an AI coding assistant" and still say what it did and what I checked. After that the gate passed and I opened the PR through Claude Code.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: Installed the PR monitor on Windows and wrote a playbook from openmed's real merge history**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+The monitor needed the same Windows fix as my other tools: it calls `claude` by bare name, which Windows can't launch from Python when `claude` is a `.cmd` shim, so I resolved it with `shutil.which`. For staleness I looked at five merged outside PRs. openmed has one maintainer who merges in batches, so the waits were 0, 1, 17, 22 and 28 days with no review comments first. I set my nudge threshold at 30 quiet days instead of the week I would have guessed. My first run, four minutes after I opened PR #5541, drafted a wait note citing that rule: no nudge before about 2026-12-11. I kept it off the thread. It also flagged a skipped CI job and the merge state UNSTABLE, so I'm checking whether that job is required before any nudge says "CI passes".
 
 ---
 
@@ -84,7 +83,7 @@ What the scout got right: the open-PR check saved me from five dead ends in one 
 **Toolkit**
 
 - Tool: issue-scout's fit profile and checks, run as a fresh scan with Claude Code on 2026-11-11 after #359 fell through.
-- What it produced: an accept for openmed #4963 (help wanted, no competing PR, adopted repo, no AI restrictions) and rejects for eight others: seven with open PRs, and pycord for its AI policy. openrag #1384 was set aside because the core team had planned it.
+- What it produced: an accept for openmed #4963 (help wanted, no competing PR, adopted repo, AI-assisted contributions allowed) and rejects for eight others: seven with open PRs, and pycord for its AI policy. openrag #1384 was set aside because the core team had planned it.
 - Difficulties: about 300 recent issues came back, and most good-first-issues already had an open PR. The rubric also has no signal for "the core team already planned this", which ended #359. GitHub's search rate limit slowed the scan.
 - What changed: I now read a maintainer-set milestone without a help-wanted label as "the team plans to do this", and I treat a help-wanted label as an invitation. I'd add that as a scout check.
 
@@ -385,6 +384,10 @@ Posted my claim after the voice guard made me add a report-back date. Forked and
 
 The full test suite failed 65 tests, which worried me until I saw they were all symlink-privilege and line-ending failures. Re-running the same 31 files on master gave the same 65, so I recorded the full suite as excluded in my manifest instead of chasing failures my change didn't cause. I installed the ship-gate and patched it for Windows the same way as my unit 6 voice guard: the real python.exe instead of the pyenv shim, the matcher widened to `Bash|PowerShell`, and `claude` resolved with `shutil.which`. The hook test stopped `gh pr create --help` with `ship-gate: STOP.`, and plan-check accepted my plan on the first run.
 
+**2026-11-10**
+
+Wrote test_evidence.md and pr_draft.md and ran the ship-gate. It stopped three times: once because the description file wasn't in my clone yet, once for a "Generated with" footer that AGENTS.md bans and a "no new warnings" box with no evidence, and once in my voice guard over naming the AI tool. After those fixes and the repo's `check_repo_policy.py` (`Commit attribution policy passed: 2 commits checked`), the gate passed and I opened PR #5541. I posted my report-back on #4963 pointing to the PR. Then I installed the PR monitor, wrote my playbook from openmed's merge history, and the first run drafted a wait note, which I didn't post.
+
 **Toolkit**
 
 - Tool: Claude Code for drafting the fix, the tests and the PowerShell blocks. I ran every command on my machine and pasted the output back.
@@ -419,25 +422,29 @@ The full test suite failed 65 tests, which worried me until I saw they were all 
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+- How an evaluation harness can report numbers that disagree with each other: scoring the same fixtures in two passes means a nondeterministic model gives different predictions to each pass. Recording predictions once and replaying them is a small change that removes the problem.
+- Writing a regression test for a bug with a fake model: a counting runner proves how many times inference runs, and a "drifting" runner that answers differently the second time proves the slices use the same predictions as the overall score.
+- Running a large repo's checks without `make`: reading the Makefile targets and running the commands behind them with `uv run --frozen --extra dev`, and checking that full-suite failures also happen on master before calling them unrelated.
+- Making Python tools work on Windows: calling the real `python.exe` instead of the pyenv shim, finding `claude` with `shutil.which`, and writing files with LF endings.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+- My first issue (#359) fell through when the maintainer decided to fix it themselves, with two units of work left in one week. I re-ran my scout's checks the same night and had a new claim posted within hours.
+- The full test suite failed 65 tests on my machine. Running the same 31 files on master gave the same 65, so I recorded them as excluded with a dated reason instead of chasing failures my change didn't cause.
+- My ship-gate stopped the PR three times. The real catch was openmed's AGENTS.md rule against tool names and generation footers in PR text, which conflicted with my own voice-guide rule to name the AI tool. I followed the repo and added that exception to my rule.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+- Read AGENTS.md along with CONTRIBUTING before deciding a repo has "no AI policy". I missed the attribution rule until the gate caught it.
+- Check the maintainer's plans before I invest in an issue. A milestone the core team set without a help-wanted label means they plan to do it themselves.
+- Write the PR description and evidence files before the first gate run, and keep them in my course repo so they're easy to move between machines.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- [openmed issue #4963](https://github.com/maziyarpanahi/openmed/issues/4963): its "Problem and existing coverage" section pointed at the exact lines, and its suggested replay runner became my fix.
+- [openmed AGENTS.md](https://github.com/maziyarpanahi/openmed/blob/master/AGENTS.md): the commit and PR attribution rules, and `scripts/release/check_repo_policy.py`, which I ran before pushing.
+- [openmed CONTRIBUTING.md](https://github.com/maziyarpanahi/openmed/blob/master/CONTRIBUTING.md) and the Makefile: the lint, format and type-check commands in my ship manifest.
+- [openmed MAINTAINERS.md](https://github.com/maziyarpanahi/openmed/blob/master/MAINTAINERS.md) and the repo's closed PRs: the single maintainer and the batch-merge pattern behind my staleness threshold.
+- [openmed PR template](https://github.com/maziyarpanahi/openmed/blob/master/.github/PULL_REQUEST_TEMPLATE.md): the structure of my PR description.
